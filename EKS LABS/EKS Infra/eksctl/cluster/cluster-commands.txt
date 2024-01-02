@@ -1,0 +1,1 @@
+eksctl create cluster --name eks-labs --region us-east-1 --version 1.28 --vpc-private-subnets subnet-ExampleID1,subnet-ExampleID2 --without-nodegroup
