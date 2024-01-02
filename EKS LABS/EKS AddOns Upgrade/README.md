@@ -1,0 +1,1 @@
+This script performs upgrades on the EKS Add Ons running on EKS Clusters. The script performs the upgrade process based upon the current k8s version and upgrades from the current EKS Add-On version to the latest Add-On version for the corresponding cluster version
