@@ -1,0 +1,11 @@
+View the names of add-ons available for a cluster version. Replace 1.28 with the version of your cluster.
+eksctl utils describe-addon-versions --kubernetes-version 1.28 | grep AddonName
+
+
+View the versions available for the add-on that you would like to create. Replace 1.28 with the version of your cluster. Replace name-of-addon with the name of the add-on you want to view the versions for. 
+eksctl utils describe-addon-versions --kubernetes-version 1.28 --name name-of-addon | grep AddonVersion
+
+Create the EKS Add on. Ideally instead of creating multiple service accounts & roles you can use the EKS Node Role to allow each of the Add Ons to inherit their permissions from there.
+eksctl create addon --cluster my-cluster --name name-of-addon --version latest \
+    --service-account-role-arn arn:aws:iam::111122223333:role/role-name --force
+
