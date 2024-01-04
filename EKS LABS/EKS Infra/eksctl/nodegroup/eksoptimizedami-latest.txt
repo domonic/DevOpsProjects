@@ -1,0 +1,2 @@
+aws ssm get-parameter --name /aws/service/eks/optimized-ami/1.28/amazon-linux-2/recommended/image_id \
+                --region us-east-1 --query "Parameter.Value" --output text
