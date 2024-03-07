@@ -43,6 +43,29 @@ Ensure the delay is sufficient for your application's needs.
 **Test Deployment**: Perform a deployment to test the configuration. You should observe that the ALB does not route new requests to Pods that are terminating, effectively eliminating 502 errors during deployments.
 
 
+
+4. # Implementation with Blue/Green Deployments
+
+**Setup Separate Node Groups**: Create separate node groups in EKS for the blue and green environments. These will serve as distinct target groups under the ALB, allowing for independent scaling and management.
+**Configure ALB Ingress to Manage Traffic**: Use annotations in your Kubernetes Ingress resource to manage traffic distribution between the blue and green target groups. Initially, all traffic is routed to the blue group.
+    ```yaml
+    annotations:
+      alb.ingress.kubernetes.io/actions.forward-single-tg: >
+        {"Type":"forward","ForwardConfig":{"TargetGroups":[{"ServiceName":"blue-service","ServicePort":"80"}]}}
+    ```
+
+**Deploy Green Environment**: Roll out the new version of your application to the green node group. At this stage, no live traffic is directed to the green environment, allowing for thorough testing and validation.
+**Switch Traffic**: Once the green deployment is verified to be stable and ready, update the Ingress resource to switch traffic from the blue target group to the green target group. This can be done with no downtime, ensuring a seamless transition for end-users.
+    ```yaml
+    annotations:
+      alb.ingress.kubernetes.io/actions.forward-single-tg: >
+        {"Type":"forward","ForwardConfig":{"TargetGroups":[{"ServiceName":"green-service","ServicePort":"80"}]}}
+    ```
+
+**Monitor and Finalize**: After the traffic has been successfully rerouted to the green environment, monitor the application for any issues. If everything operates as expected, the blue environment can be decommissioned or kept as a rollback option.
+
+
+
 # Benefits
 
 Implementing this strategy ensures that your Kubernetes-hosted applications can be updated or scaled without introducing service interruptions or degrading the user experience. By carefully managing the lifecycle of Pods and their traffic, you achieve zero downtime deployments.
