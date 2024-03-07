@@ -48,14 +48,16 @@ Ensure the delay is sufficient for your application's needs.
 
 **Setup Separate Node Groups**: Create separate node groups in EKS for the blue and green environments. These will serve as distinct target groups under the ALB, allowing for independent scaling and management.
 **Configure ALB Ingress to Manage Traffic**: Use annotations in your Kubernetes Ingress resource to manage traffic distribution between the blue and green target groups. Initially, all traffic is routed to the blue group.
+
     ```yaml
     annotations:
       alb.ingress.kubernetes.io/actions.forward-single-tg: >
         {"Type":"forward","ForwardConfig":{"TargetGroups":[{"ServiceName":"blue-service","ServicePort":"80"}]}}
     ```
-
+    
 **Deploy Green Environment**: Roll out the new version of your application to the green node group. At this stage, no live traffic is directed to the green environment, allowing for thorough testing and validation.
 **Switch Traffic**: Once the green deployment is verified to be stable and ready, update the Ingress resource to switch traffic from the blue target group to the green target group. This can be done with no downtime, ensuring a seamless transition for end-users.
+
     ```yaml
     annotations:
       alb.ingress.kubernetes.io/actions.forward-single-tg: >
