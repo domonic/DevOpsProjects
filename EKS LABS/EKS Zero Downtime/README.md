@@ -44,7 +44,7 @@ Ensure the delay is sufficient for your application's needs.
 
 
 
-4. # Implementation with Blue/Green Deployments
+# Implementation with Blue/Green Deployments
 
 **Setup Separate Node Groups**: Create separate node groups in EKS for the blue and green environments. These will serve as distinct target groups under the ALB, allowing for independent scaling and management.
 **Configure ALB Ingress to Manage Traffic**: Use annotations in your Kubernetes Ingress resource to manage traffic distribution between the blue and green target groups. Initially, all traffic is routed to the blue group.
