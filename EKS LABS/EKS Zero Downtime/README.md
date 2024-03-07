@@ -29,11 +29,9 @@ Deployments on Kubernetes can sometimes result in temporary service unavailabili
     ```yaml
     readinessProbe:
       exec:
-        command:
-            cat
-            /tmp/healthy
-                  initialDelaySeconds: 5
-                  periodSeconds: 5
+        command: ["cat", "/tmp/healthy"]
+      initialDelaySeconds: 5
+      periodSeconds: 5
     ```
 
 
