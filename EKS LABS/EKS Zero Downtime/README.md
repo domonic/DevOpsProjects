@@ -30,10 +30,10 @@ Deployments on Kubernetes can sometimes result in temporary service unavailabili
     readinessProbe:
       exec:
         command:
-cat
-/tmp/healthy
-      initialDelaySeconds: 5
-      periodSeconds: 5
+            cat
+            /tmp/healthy
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
     ```
 
 
