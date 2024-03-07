@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue-service-2048
+  namespace: game-2048
+spec:
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 30837
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/name: blue-app-2048
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
