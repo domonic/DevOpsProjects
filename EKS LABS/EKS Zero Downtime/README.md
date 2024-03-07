@@ -11,7 +11,9 @@ Deployments on Kubernetes can sometimes result in temporary service unavailabili
 # Key Concetps
 
 **Graceful Shutdown**: Ensuring that Pods have enough time to finish processing ongoing requests before they are terminated.
+
 **Pre-Stop Hook**: A Kubernetes feature used to delay the Pod termination process, giving services extra time to handle ongoing requests.
+
 **Deregistration Delay**: A setting on the Target Group associated with the ALB, providing a buffer period before the ALB stops sending requests to the deregistering targets.
 
 
