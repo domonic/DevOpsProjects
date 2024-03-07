@@ -1,0 +1,41 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: k8s-blue-green-cluster
+  region: us-east-1
+
+
+managedNodeGroups:
+  - name: k8s-blue-ng
+    instanceType: t3.small
+    desiredCapacity: 3
+    subnets:
+      - subnet-XXXXXXXXXXXXXXXXX
+      - subnet-XXXXXXXXXXXXXXXXX
+      - subnet-XXXXXXXXXXXXXXXXX
+    ssh:
+      allow: true
+      publicKeyName: k8s-clusters-key
+    tags:
+      auto-delete: "no"
+  - name: k8s-green-ng
+    instanceType: t3.small
+    desiredCapacity: 3
+    subnets:
+      - subnet-XXXXXXXXXXXXXXXXX
+      - subnet-XXXXXXXXXXXXXXXXX
+      - subnet-XXXXXXXXXXXXXXXXX
+    ssh:
+      allow: true
+      publicKeyName: XXXXXXXXXXXXXXXXX
+    tags:
+      auto-delete: "no"
+
+
+
+
+
+
+
+

@@ -1,0 +1,26 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  generation: 1
+  labels:
+    ingress.k8s.aws/stack-name: ingress-2048
+    ingress.k8s.aws/stack-namespace: game-2048
+  name: k8s-game2048-greenser-XXXXXXXXXXXX
+  namespace: game-2048
+spec:
+  ipAddressType: ipv4
+  networking:
+    ingress:
+    - from:
+      - securityGroup:
+          groupID: sg-XXXXXXXXXXXX
+      ports:
+      - port: 80
+        protocol: TCP
+  serviceRef:
+    name: green-service-2048
+    port: 80
+  targetGroupARN: arn:aws:elasticloadbalancing:us-east-1:XXXXXXXXXXXX:targetgroup/k8s-game2048-greenser-XXXXXXXXXXXX/XXXXXXXXXXXX
+  targetType: ip
+status:
+  observedGeneration: 1
