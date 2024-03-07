@@ -50,6 +50,7 @@ Ensure the delay is sufficient for your application's needs.
 **Configure ALB Ingress to Manage Traffic**: Use annotations in your Kubernetes Ingress resource to manage traffic distribution between the blue and green target groups. Initially, all traffic is routed to the blue group.
 
     ```yaml
+    
     annotations:
       alb.ingress.kubernetes.io/actions.forward-single-tg: >
         {"Type":"forward","ForwardConfig":{"TargetGroups":[{"ServiceName":"blue-service","ServicePort":"80"}]}}
