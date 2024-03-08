@@ -68,3 +68,6 @@ Ensure the AWS Cloud Map namespace used for service discovery is created and acc
 Monitor the Cloud Map MCS Controller logs for any errors or warnings that might indicate issues with the setup.
 
 
+## Reference
+
+https://aws.amazon.com/blogs/opensource/kubernetes-multi-cluster-service-discovery-using-open-source-aws-cloud-map-mcs-controller/
