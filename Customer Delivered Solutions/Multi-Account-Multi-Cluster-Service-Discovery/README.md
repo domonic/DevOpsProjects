@@ -62,6 +62,54 @@ From a pod in Account One, verify that the service from Account Two is discovera
 # nslookup <service-name>.demo.svc.clusterset.local
 # curl -ivk <service-name>.demo.svc.clusterset.local
 ```
+
+
+
+## Example
+```bash
+# nslookup nginx-hello.demo.svc.clusterset.local
+Server:		172.20.0.10
+Address:	172.20.0.10:53
+
+
+Name:	nginx-hello.demo.svc.clusterset.local
+Address: 172.20.40.24
+
+ # curl -ivk nginx-hello.demo.svc.clusterset.local
+* processing: nginx-hello.demo.svc.clusterset.local
+*   Trying 172.20.40.24:80...
+* Connected to nginx-hello.demo.svc.clusterset.local (172.20.40.24) port 80
+> GET / HTTP/1.1
+> Host: nginx-hello.demo.svc.clusterset.local
+> User-Agent: curl/8.2.1
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+< Server: nginx/1.25.2
+Server: nginx/1.25.2
+< Date: Fri, 15 Sep 2023 05:12:38 GMT
+Date: Fri, 15 Sep 2023 05:12:38 GMT
+< Content-Type: text/plain
+Content-Type: text/plain
+< Content-Length: 158
+Content-Length: 158
+< Connection: keep-alive
+Connection: keep-alive
+< Expires: Fri, 15 Sep 2023 05:12:37 GMT
+Expires: Fri, 15 Sep 2023 05:12:37 GMT
+< Cache-Control: no-cache
+Cache-Control: no-cache
+
+<
+Server address: 172.31.16.41:80
+Server name: nginx-demo-5694f64f59-phgc6
+Date: 15/Sep/2023:05:12:38 +0000
+URI: /
+
+* Connection #0 to host nginx-hello.demo.svc.clusterset.local left intact
+```
+
 ## Additional Configuration
 
 Ensure the AWS Cloud Map namespace used for service discovery is created and accessible from both accounts.
