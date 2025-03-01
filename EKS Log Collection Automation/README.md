@@ -10,6 +10,7 @@ This project automates the collection of logs from Amazon EKS cluster worker nod
 
 ## Architecture
 
+![Architecture Diagram](./EKSLogsCollectorDiagram.png)
 
 ## Overview
 
