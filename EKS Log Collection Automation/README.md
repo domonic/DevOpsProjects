@@ -10,13 +10,14 @@ This project automates the collection of logs from Amazon EKS cluster worker nod
 
 ## Architecture
 
+![Architecture Diagram](./EKSLogsCollectorDiagram.png)
 
 ## Overview
 
 - **AWS Lambda Function:**  
   The Lambda function is responsible for:
   - Retrieving environment variables (e.g., cluster name, S3 bucket name).
-  - Determining the target EC2 instance (which is part of your EKS cluster).
+  - Determining the target EC2 instance (which are part of your EKS cluster).
   - Sending an SSM command that executes a log collector script on the target instance.
   - The log collector script downloads, executes, and then uploads the log bundle to the specified S3 bucket.
   
