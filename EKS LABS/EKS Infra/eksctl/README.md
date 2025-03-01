@@ -1,1 +1,0 @@
-This is designed to walkthrough the commands in which can be used to dedploy an EKS Cluster seeminglessly with eksctl. With eksctl you can easily stand up an EKS cluster to your k8s version of choice as well as deploy nodegroups for your workloads to run on and EKS specific add ons to better improve your EKS Cluster and workload experience.
