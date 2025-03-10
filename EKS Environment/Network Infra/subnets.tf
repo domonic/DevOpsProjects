@@ -6,10 +6,9 @@ resource "aws_subnet" "public" {
     }
   ]...)
 
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = each.value.subnet_list[0] # First CIDR block in the list
-  availability_zone = var.azs[index(var.public_subnets[split("-", each.key)[0]][split("-", each.key)[1]], each.value.subnet_list[0])]
-
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = each.value.subnet_list[0] # First CIDR block in the list
+  availability_zone       = var.azs[index(["blue", "green"], split("-", each.key)[1])]
   map_public_ip_on_launch = true
 
   tags = {
@@ -27,11 +26,10 @@ resource "aws_subnet" "private" {
     }
   ]...)
 
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = each.value.subnet_list[0] # First CIDR block in the list
-  availability_zone = var.azs[index(var.private_subnets[split("-", each.key)[0]][split("-", each.key)[1]], each.value.subnet_list[0])]
-
-
+  vpc_id     = aws_vpc.main.id
+  cidr_block = each.value.subnet_list[0] # First CIDR block in the list
+  #availability_zone = var.azs[index(var.private_subnets[split("-", each.key)[0]][split("-", each.key)[1]], each.value.subnet_list[0])]
+  availability_zone = var.azs[index(["blue", "green"], split("-", each.key)[1])]
   tags = {
     Name            = "private-${each.key}"
     Environment     = split("-", each.key)[0] # Extracts 'dev', 'staging', 'prod'
