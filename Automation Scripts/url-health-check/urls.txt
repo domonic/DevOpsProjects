@@ -8,3 +8,5 @@ https://httpstat.us/307
 https://httpstat.us/200
 https://httpstat.us/201
 https://httpstat.us/202
+https://flask.palletsprojects.com/en/stable/quickstart/
+https://fastapi.tiangolo.com/#installation
