@@ -99,11 +99,18 @@ resource "aws_iam_role_policy_attachment" "node_group_ecr" {
   role       = aws_iam_role.node_group.name
 }
 
+resource "aws_iam_role_policy_attachment" "node_group_ebs" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role       = aws_iam_role.node_group.name
+}
+
 
 
 # ----------------------------------------------------------
 # EKS Managed Node Group
 # ----------------------------------------------------------
+
+
 
 resource "aws_eks_node_group" "blue" {
   cluster_name    = aws_eks_cluster.this.name
@@ -123,8 +130,27 @@ resource "aws_eks_node_group" "blue" {
   depends_on = [
     aws_iam_role_policy_attachment.node_group_worker,
     aws_iam_role_policy_attachment.node_group_cni,
-    aws_iam_role_policy_attachment.node_group_ecr
+    aws_iam_role_policy_attachment.node_group_ecr,
+    aws_iam_role_policy_attachment.node_group_ebs,
   ]
+
+  tags = {
+    Name                                                 = "${var.cluster_name}-node-group-green"
+    "kubernetes.io/cluster/${aws_eks_cluster.this.name}" = "owned"
+  }
+
+  labels = {
+    "nodegroup-name" = "${var.cluster_name}-node-group-green"
+  }
+
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
+  tags_all = {
+    "Name" = "${var.cluster_name}-node-group-green"
+  }
+
+
 }
 
 resource "aws_eks_node_group" "green" {
@@ -145,22 +171,41 @@ resource "aws_eks_node_group" "green" {
   depends_on = [
     aws_iam_role_policy_attachment.node_group_worker,
     aws_iam_role_policy_attachment.node_group_cni,
-    aws_iam_role_policy_attachment.node_group_ecr
+    aws_iam_role_policy_attachment.node_group_ecr,
+    aws_iam_role_policy_attachment.node_group_ebs,
   ]
+  tags = {
+    Name                                                 = "${var.cluster_name}-node-group-green"
+    "kubernetes.io/cluster/${aws_eks_cluster.this.name}" = "owned"
+  }
+
+  labels = {
+    "nodegroup-name" = "${var.cluster_name}-node-group-green"
+  }
+
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
+
+  tags_all = {
+    "Name" = "${var.cluster_name}-node-group-green"
+  }
+
 }
+
 
 # ----------------------------------------------------------
 # Optional EKS Add-ons
 # ----------------------------------------------------------
 
-resource "aws_eks_addon" "addons" {
+resource "aws_eks_addon" "this" {
   for_each = var.eks_addons
 
-  cluster_name             = aws_eks_cluster.this.name
-  addon_name               = each.key
-  addon_version            = each.value.addon_version
-  resolve_conflicts        = each.value.resolve_conflicts
-  service_account_role_arn = null
+  cluster_name                = aws_eks_cluster.this.name
+  addon_name                  = each.key
+  addon_version               = try(each.value.addon_version, null)
+  resolve_conflicts_on_update = try(each.value.resolve_conflicts, "OVERWRITE")
+  service_account_role_arn    = try(each.value.service_account_role_arn, null)
 
   depends_on = [aws_eks_cluster.this]
 }

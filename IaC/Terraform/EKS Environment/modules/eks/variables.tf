@@ -38,6 +38,8 @@ variable "max_size" {
   type        = number
 }
 
+
+
 variable "eks_addons" {
   description = "Map of EKS add-ons to install"
   type = map(object({

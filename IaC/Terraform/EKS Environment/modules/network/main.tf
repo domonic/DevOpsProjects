@@ -25,9 +25,11 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name            = "public-${each.key}"
-    Environment     = split("-", each.key)[0] # Extracts 'dev', 'staging', 'prod'
-    DeploymentGroup = split("-", each.key)[1] # Extracts 'blue', 'green'
+    Name                                                       = "public-${each.key}"
+    Environment                                                = split("-", each.key)[0] # Extracts 'dev', 'staging', 'prod'
+    DeploymentGroup                                            = split("-", each.key)[1] # Extracts 'blue', 'green'
+    "kubernetes.io/role/elb"                                   = 1
+    "kubernetes.io/cluster/k8s-${split("-", each.key)[0]}-eks" = "owned"
   }
 }
 
@@ -45,9 +47,11 @@ resource "aws_subnet" "private" {
   #availability_zone = var.azs[index(var.private_subnets[split("-", each.key)[0]][split("-", each.key)[1]], each.value.subnet_list[0])]
   availability_zone = var.azs[index(["blue", "green"], split("-", each.key)[1])]
   tags = {
-    Name            = "private-${each.key}"
-    Environment     = split("-", each.key)[0] # Extracts 'dev', 'staging', 'prod'
-    DeploymentGroup = split("-", each.key)[1] # Extracts 'blue', 'green'
+    Name                                                       = "private-${each.key}"
+    Environment                                                = split("-", each.key)[0] # Extracts 'dev', 'staging', 'prod'
+    DeploymentGroup                                            = split("-", each.key)[1] # Extracts 'blue', 'green'
+    "kubernetes.io/role/internal-elb"                          = 1
+    "kubernetes.io/cluster/k8s-${split("-", each.key)[0]}-eks" = "owned"
   }
 }
 

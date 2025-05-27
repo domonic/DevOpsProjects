@@ -1,0 +1,29 @@
+controller:
+  ingress:
+    ingressClassName: alb
+    enabled: true
+    annotations:
+      alb.ingress.kubernetes.io/healthcheck-path: /jenkins/login
+      alb.ingress.kubernetes.io/ingress-class: alb
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/group.name: jenkins-ingress
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+      alb.ingress.kubernetes.io/conditions.jenkins: |
+        [
+          {
+            "Field": "path-pattern",
+            "PathPatternConfig": {
+              "Values": ["/jenkins", "/jenkins/*"]
+            }
+          }
+        ]
+    hosts: 
+      - k8s-jenkinsingress-13a4fc1a1e-904436539.us-west-2.elb.amazonaws.com
+    path: /jenkins
+    pathType: Prefix
+  serviceType: ClusterIP
+  persistence:
+    enabled: true
+    storageClass: "gp2"
+    size: 10Gi
