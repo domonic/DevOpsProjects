@@ -11,49 +11,94 @@ resource "aws_vpc" "main" {
 }
 
 # public subnet infra
-resource "aws_subnet" "public" {
-  for_each = merge([
-    for env, groups in var.public_subnets : {
-      for group, subnets in groups :
-      "${env}-${group}" => { subnet_list = subnets }
+locals {
+  public_subnets_nested = flatten([
+    for env in var.envs : [
+      for deployment in var.deployments : [
+        for idx, az in var.azs : {
+          key        = "${env}-${deployment}-${az}"
+          cidr_block = var.public_subnets[env][deployment][idx]
+          az         = az
+          env        = env
+          group      = deployment
+        }
+      ]
+    ]
+  ])
+
+  public_subnets_map = {
+    for item in local.public_subnets_nested :
+    item.key => {
+      cidr_block = item.cidr_block
+      az         = item.az
+      env        = item.env
+      group      = item.group
     }
-  ]...)
+  }
+
+  private_subnets_nested = flatten([
+    for env in var.envs : [
+      for deployment in var.deployments : [
+        for idx, az in var.azs : {
+          key        = "${env}-${deployment}-${az}"
+          cidr_block = var.private_subnets[env][deployment][idx]
+          az         = az
+          env        = env
+          group      = deployment
+        }
+      ]
+    ]
+  ])
+
+  private_subnets_map = {
+    for item in local.private_subnets_nested :
+    item.key => {
+      cidr_block = item.cidr_block
+      az         = item.az
+      env        = item.env
+      group      = item.group
+    }
+  }
+}
+
+
+resource "aws_subnet" "public" {
+  for_each = local.public_subnets_map
 
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = each.value.subnet_list[0] # First CIDR block in the list
-  availability_zone       = var.azs[index(["blue", "green"], split("-", each.key)[1])]
+  cidr_block              = each.value.cidr_block
+  availability_zone       = each.value.az
   map_public_ip_on_launch = true
 
   tags = {
-    Name                                                       = "public-${each.key}"
-    Environment                                                = split("-", each.key)[0] # Extracts 'dev', 'staging', 'prod'
-    DeploymentGroup                                            = split("-", each.key)[1] # Extracts 'blue', 'green'
-    "kubernetes.io/role/elb"                                   = 1
-    "kubernetes.io/cluster/k8s-${split("-", each.key)[0]}-eks" = "owned"
+    Name                                              = "public-${each.value.env}-${each.value.group}-${each.value.az}"
+    Environment                                       = each.value.env
+    DeploymentGroup                                   = each.value.group
+    "kubernetes.io/role/elb"                          = "1"
+    "kubernetes.io/cluster/k8s-${each.value.env}-eks" = "owned"
   }
 }
+
+
 
 # private subnet infra
 resource "aws_subnet" "private" {
-  for_each = merge([
-    for env, groups in var.private_subnets : {
-      for group, subnets in groups :
-      "${env}-${group}" => { subnet_list = subnets }
-    }
-  ]...)
+  for_each = local.private_subnets_map
 
-  vpc_id     = aws_vpc.main.id
-  cidr_block = each.value.subnet_list[0] # First CIDR block in the list
-  #availability_zone = var.azs[index(var.private_subnets[split("-", each.key)[0]][split("-", each.key)[1]], each.value.subnet_list[0])]
-  availability_zone = var.azs[index(["blue", "green"], split("-", each.key)[1])]
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = each.value.cidr_block
+  availability_zone = each.value.az
+
+
   tags = {
-    Name                                                       = "private-${each.key}"
-    Environment                                                = split("-", each.key)[0] # Extracts 'dev', 'staging', 'prod'
-    DeploymentGroup                                            = split("-", each.key)[1] # Extracts 'blue', 'green'
-    "kubernetes.io/role/internal-elb"                          = 1
-    "kubernetes.io/cluster/k8s-${split("-", each.key)[0]}-eks" = "owned"
+    Name                                              = "private-${each.value.env}-${each.value.group}-${each.value.az}"
+    Environment                                       = each.value.env
+    DeploymentGroup                                   = each.value.group
+    "kubernetes.io/role/internal-elb"                 = "1"
+    "kubernetes.io/cluster/k8s-${each.value.env}-eks" = "owned"
   }
 }
+
 
 # public route table infra
 resource "aws_route_table" "public" {
@@ -113,7 +158,7 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public["prod-green"].id
+  subnet_id     = aws_subnet.public["prod-green-us-west-2a"].id
 
 
   tags = {
