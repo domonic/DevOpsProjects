@@ -18,7 +18,7 @@ def home():
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({'status': 'OK', 'message': 'API is healthy'}), 200
+    return jsonify({'status': 'OK', 'message': 'API is reported healthy'}), 200
 
 
 @app.route('/signup', methods=['POST'])
