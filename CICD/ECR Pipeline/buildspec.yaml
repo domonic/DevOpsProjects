@@ -9,7 +9,7 @@ phases:
     commands:
       - echo Building Docker image...
       - docker build -t flask-api-app-repo .
-      - docker tag my-app:latest $ECR_URI:latest
+      - docker tag flask-api-app-repo:latest 644533755319.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo:latest
   post_build:
     commands:
       - echo Pushing image to ECR...
