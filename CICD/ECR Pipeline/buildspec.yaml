@@ -8,7 +8,7 @@ phases:
   build:
     commands:
       - echo Building Docker image...
-      - docker build -t flask-api-app-repo CICD/ECR Pipeline/Dockerfile
+      - docker build -t flask-api-app-repo -f CICD/ECR Pipeline/Dockerfile
       - docker tag flask-api-app-repo:latest 644533755319.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo:latest
   post_build:
     commands:
