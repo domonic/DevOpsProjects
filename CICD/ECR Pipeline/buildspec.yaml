@@ -13,5 +13,5 @@ phases:
   post_build:
     commands:
       - echo Pushing image to ECR...
-      - docker push $ECR_URI:latest
+      - docker push 644533755319.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo:latest
       - echo Build completed on `date`
