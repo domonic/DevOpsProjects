@@ -23,38 +23,32 @@ resource "aws_iam_role" "codebuild_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "codebuild_attach" {
+resource "aws_iam_role_policy_attachment" "codebuild_attach_cbd" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
 }
 
-resource "aws_iam_policy" "codebuild_ecr_policy" {
-  name        = "codebuild-ecr-push-policy"
-  description = "Allows CodeBuild to push Docker images to ECR"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:InitiateLayerUpload",
-          "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload",
-          "ecr:PutImage"
-        ]
-        Resource = aws_ecr_repository.main.arn
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "codebuild_ecr_attach" {
+resource "aws_iam_role_policy_attachment" "codebuild_attach_cba" {
   role       = aws_iam_role.codebuild_role.name
-  policy_arn = aws_iam_policy.codebuild_ecr_policy.arn
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess"
 }
+
+
+resource "aws_iam_role_policy_attachment" "codebuild_attach_ecr" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+}
+resource "aws_iam_role_policy_attachment" "codebuild_attach_s3" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild_attach_cw" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+
 
 
 resource "aws_codebuild_project" "build" {
@@ -71,12 +65,14 @@ resource "aws_codebuild_project" "build" {
     type            = "LINUX_CONTAINER"
     privileged_mode = true
     environment_variable {
-      name  = "ECR_URI"
-      value = aws_ecr_repository.main.repository_url
+      name = "ECR_URI"
+      #value = aws_ecr_repository.main.repository_url
+      value = "644533755319.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo"
     }
     environment_variable {
-      name  = "AWS_REGION"
-      value = var.aws_region
+      name = "AWS_REGION"
+      #value = var.aws_region
+      value = "us-west-2"
     }
   }
 
@@ -98,9 +94,19 @@ resource "aws_iam_role" "codepipeline_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "codepipeline_attach" {
+resource "aws_iam_role_policy_attachment" "codepipeline_attach_cpf" {
   role       = aws_iam_role.codepipeline_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "codepipeline_attach_cba" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "codepipeline_attach_s3" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 resource "aws_codepipeline" "main" {
@@ -144,7 +150,7 @@ resource "aws_codepipeline" "main" {
       output_artifacts = ["build_output"]
       configuration = {
         ProjectName       = aws_codebuild_project.build.name
-        BuildspecOverride = "../../buildspec.yaml"
+        BuildspecOverride = "CICD/ECR Pipeline/buildspec.yaml"
       }
     }
   }

@@ -4,14 +4,14 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 644533755319.dkr.ecr.us-west-2.amazonaws.com
+      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin <accound-id>.dkr.ecr.us-west-2.amazonaws.com
   build:
     commands:
       - echo Building Docker image...
       - docker build -t flask-api-app-repo -f CICD/ECR\ Pipeline/Dockerfile CICD/ECR\ Pipeline/
-      - docker tag flask-api-app-repo:latest 644533755319.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo:latest
+      - docker tag flask-api-app-repo:latest <accound-id>.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo:latest
   post_build:
     commands:
       - echo Pushing image to ECR...
-      - docker push 644533755319.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo:latest
+      - docker push <accound-id>.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo:latest
       - echo Build completed on `date`
