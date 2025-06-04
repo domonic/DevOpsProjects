@@ -4,7 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 1234567890.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo
+      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 644533755319.dkr.ecr.us-west-2.amazonaws.com
   build:
     commands:
       - echo Building Docker image...
