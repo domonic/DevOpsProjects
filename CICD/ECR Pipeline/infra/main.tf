@@ -67,7 +67,7 @@ resource "aws_codebuild_project" "build" {
     environment_variable {
       name = "ECR_URI"
       #value = aws_ecr_repository.main.repository_url
-      value = "644533755319.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo"
+      value = "<accound-id>.dkr.ecr.us-west-2.amazonaws.com/flask-api-app-repo"
     }
     environment_variable {
       name = "AWS_REGION"
