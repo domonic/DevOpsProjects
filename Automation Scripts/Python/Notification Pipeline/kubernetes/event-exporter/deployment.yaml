@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-exporter
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: event-exporter
+    app.kubernetes.io/component: karpenter-alerts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: event-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: event-exporter
+        app.kubernetes.io/component: karpenter-alerts
+    spec:
+      serviceAccountName: event-exporter
+      containers:
+        - name: event-exporter
+          image: ghcr.io/resmoio/kubernetes-event-exporter:v1.7
+          args:
+            - -conf=/data/config.yaml
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: config
+              mountPath: /data
+          env:
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: event-exporter-secrets
+                  key: slack-webhook-url
+      volumes:
+        - name: config
+          configMap:
+            name: event-exporter-cfg

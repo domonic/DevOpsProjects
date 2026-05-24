@@ -1,0 +1,7 @@
+[
+  {
+    "Source": "aws.health",
+    "DetailType": "AWS Health Event",
+    "Detail": "{\"service\":\"EC2\",\"eventTypeCategory\":\"scheduledChange\",\"eventTypeCode\":\"AWS_EC2_SYSTEM_MAINTENANCE_EVENT\",\"affectedEntities\":[{\"entityValue\":\"i-0abc123def456789a\"},{\"entityValue\":\"i-0def456abc789012b\"}]}"
+  }
+]

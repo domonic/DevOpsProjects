@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: event-exporter-cfg
+  namespace: monitoring
+data:
+  config.yaml: |
+    logLevel: error
+    metricsNamePrefix: event_exporter_
+    route:
+      # Route Karpenter disruption events to Slack
+      routes:
+        - match:
+            - receiver: "slack-karpenter"
+              reasons:
+                - "DisruptionInitiated"
+                - "DisruptionTerminating"
+                - "DisruptionBlocked"
+                - "Unconsolidatable"
+                - "SpotInterrupted"
+                - "InstanceUnhealthy"
+                - "NodeTerminating"
+          # Also catch node lifecycle events
+        - match:
+            - receiver: "slack-karpenter"
+              involvedObject:
+                apiVersion: "karpenter.sh/v1"
+                kind: "NodeClaim"
+        - match:
+            - receiver: "slack-node-health"
+              reasons:
+                - "NodeNotReady"
+                - "NodeReady"
+                - "TerminatingEvictedPod"
+      # Drop noisy events
+      drop:
+        - reasons:
+            - "Pulling"
+            - "Pulled"
+            - "Created"
+            - "Started"
+            - "Scheduled"
+            - "SuccessfulCreate"
+            - "ScalingReplicaSet"
+    receivers:
+      - name: "slack-karpenter"
+        webhook:
+          endpoint: "${SLACK_WEBHOOK_URL}"
+          headers:
+            Content-Type: application/json
+          layout:
+            blocks: |
+              [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🔄 Karpenter Disruption — {{ .Reason }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Node/Claim:*\n`{{ .InvolvedObject.Name }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Kind:*\n`{{ .InvolvedObject.Kind }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Namespace:*\n`{{ .InvolvedObject.Namespace }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Reason:*\n`{{ .Reason }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Message:*\n{{ .Message }}"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "Time: `{{ .LastTimestamp }}` | Count: `{{ .Count }}`"
+                    }
+                  ]
+                },
+                {"type": "divider"}
+              ]
+      - name: "slack-node-health"
+        webhook:
+          endpoint: "${SLACK_WEBHOOK_URL}"
+          headers:
+            Content-Type: application/json
+          layout:
+            blocks: |
+              [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🏥 Node Health — {{ .Reason }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Node:*\n`{{ .InvolvedObject.Name }}`"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Reason:*\n`{{ .Reason }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Message:*\n{{ .Message }}"
+                  }
+                },
+                {"type": "divider"}
+              ]

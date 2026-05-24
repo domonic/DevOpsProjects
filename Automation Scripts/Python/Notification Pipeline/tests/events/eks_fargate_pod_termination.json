@@ -1,0 +1,7 @@
+[
+  {
+    "Source": "aws.eks",
+    "DetailType": "EKS Fargate Pod Scheduled Termination",
+    "Detail": "{\"clusterName\":\"production-eks\",\"fargateProfileName\":\"default\",\"podName\":\"api-server-7b9f4c6d8-x2k4m\",\"namespace\":\"production\"}"
+  }
+]
